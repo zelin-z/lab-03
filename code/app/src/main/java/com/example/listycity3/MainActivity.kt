@@ -13,39 +13,24 @@ import com.example.listycity3.ui.theme.ListyCity3Theme
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
 
         val cityRepository = CityRepository()
 
         setContent {
-
             ListyCity3Theme {
-
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
-
                     CityListScreen(
                         cities = cityRepository.cities,
-
-                        modifier = Modifier.padding(
-                            innerPadding
-                        ),
-
+                        modifier = Modifier.padding(innerPadding),
                         onAddCity = { city ->
-
                             cityRepository.addCity(city)
                         },
-
-                        onUpdateCity = { oldCity, updatedCity ->
-
-                            cityRepository.updateCity(
-                                oldCity,
-                                updatedCity
-                            )
+                        onUpdateCity = { index, updatedCity ->
+                            cityRepository.updateCity(index, updatedCity)
                         }
                     )
                 }

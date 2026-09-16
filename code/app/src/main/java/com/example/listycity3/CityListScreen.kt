@@ -27,87 +27,61 @@ fun CityListScreen(
     cities: List<City>,
     modifier: Modifier = Modifier,
     onAddCity: (City) -> Unit = {},
-    onUpdateCity: (City, City) -> Unit = { _, _ -> }
+    onUpdateCity: (Int, City) -> Unit = { _, _ -> }
 ) {
     var cityName by remember { mutableStateOf("") }
     var provinceName by remember { mutableStateOf("") }
 
-    var selectedCity by remember {
-        mutableStateOf<City?>(null)
+    // Track the selected row so duplicate cities can be edited separately.
+    var selectedCityIndex by remember {
+        mutableStateOf<Int?>(null)
     }
 
     Column(modifier = modifier) {
-
         OutlinedTextField(
             value = cityName,
-            onValueChange = {
-                cityName = it
-            },
-            label = {
-                Text("City")
-            },
+            onValueChange = { cityName = it },
+            label = { Text("City") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 4.dp
-                )
+                .padding(horizontal = 16.dp, vertical = 4.dp)
         )
 
         OutlinedTextField(
             value = provinceName,
-            onValueChange = {
-                provinceName = it
-            },
-            label = {
-                Text("Province")
-            },
+            onValueChange = { provinceName = it },
+            label = { Text("Province") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 4.dp
-                )
+                .padding(horizontal = 16.dp, vertical = 4.dp)
         )
 
         Button(
             onClick = {
-
-                if (
-                    cityName.isNotBlank() &&
-                    provinceName.isNotBlank()
-                ) {
-
+                if (cityName.isNotBlank() && provinceName.isNotBlank()) {
                     val newCity = City(
                         name = cityName,
                         province = provinceName
                     )
 
-                    if (selectedCity == null) {
+                    val index = selectedCityIndex
 
-                        // Add a new city
+                    if (index == null) {
                         onAddCity(newCity)
-
                     } else {
-
-                        // Update the selected city
-                        onUpdateCity(
-                            selectedCity!!,
-                            newCity
-                        )
+                        onUpdateCity(index, newCity)
                     }
 
-                    // Clear everything after add/update
+                    // Return to add mode after saving.
                     cityName = ""
                     provinceName = ""
-                    selectedCity = null
+                    selectedCityIndex = null
                 }
             },
             modifier = Modifier.padding(16.dp)
         ) {
-
             Text(
-                text = if (selectedCity == null) {
+                text = if (selectedCityIndex == null) {
                     "Add City"
                 } else {
                     "Update City"
@@ -116,15 +90,11 @@ fun CityListScreen(
         }
 
         LazyColumn {
-
             itemsIndexed(cities) { index, city ->
-
                 CityRow(
                     city = city,
                     onClick = {
-
-                        selectedCity = city
-
+                        selectedCityIndex = index
                         cityName = city.name
                         provinceName = city.province
                     }
@@ -143,19 +113,12 @@ fun CityRow(
     city: City,
     onClick: () -> Unit = {}
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onClick()
-            }
-            .padding(
-                horizontal = 20.dp,
-                vertical = 16.dp
-            )
+            .clickable { onClick() }
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-
         Text(
             text = city.name,
             fontSize = 30.sp,
@@ -173,9 +136,7 @@ fun CityRow(
 @Preview(showBackground = true)
 @Composable
 fun CityListScreenPreview() {
-
     ListyCity3Theme {
-
         CityListScreen(
             cities = listOf(
                 City("Edmonton", "AB"),
